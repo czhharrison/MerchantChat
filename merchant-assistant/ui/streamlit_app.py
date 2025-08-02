@@ -24,6 +24,7 @@ from agent.tools.merchant_tools import (
 
 def init_session_state():
     """初始化session state"""
+<<<<<<< HEAD
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
     
@@ -41,6 +42,13 @@ def init_session_state():
             'ctr_evaluation': None,
             'competitor_analysis': None
         }
+=======
+    if 'assistant' not in st.session_state:
+        st.session_state.assistant = MerchantAssistantAgent()
+    
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
 
 
 def main():
@@ -79,6 +87,7 @@ def main():
         )
         
         if model_type == "Ollama模式":
+<<<<<<< HEAD
             model_name = st.text_input("模型名称", value="qwen2.5:7b")
             model_url = st.text_input("服务地址", value="http://localhost:11434")
         
@@ -105,6 +114,11 @@ def main():
             
             st.success(f"✅ 已切换到{model_type}")
         
+=======
+            model_name = st.text_input("模型名称", value="qwen2")
+            model_url = st.text_input("服务地址", value="http://localhost:11434")
+        
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         # 全局参数
         st.subheader("默认参数")
         default_audience = st.selectbox(
@@ -172,6 +186,7 @@ def main():
                     budget=budget
                 )
                 
+<<<<<<< HEAD
                 # 保存解决方案到session state
                 st.session_state.last_solution = solution
                 
@@ -179,6 +194,9 @@ def main():
         if hasattr(st.session_state, 'last_solution') and st.session_state.last_solution:
             solution = st.session_state.last_solution
             if solution["success"]:
+=======
+                if solution["success"]:
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
                     # 显示结果
                     st.success("✅ 解决方案生成成功！")
                     
@@ -252,6 +270,7 @@ def main():
                         st.write("**差异化建议：**")
                         for suggestion in comp_analysis["differentiation_suggestions"]:
                             st.write(f"• {suggestion}")
+<<<<<<< HEAD
             else:
                 st.error(f"❌ 生成失败：{solution.get('error', '未知错误')}")
                 
@@ -260,6 +279,10 @@ def main():
             if 'last_solution' in st.session_state:
                 del st.session_state.last_solution
             st.rerun()
+=======
+                else:
+                    st.error(f"❌ 生成失败：{solution.get('error', '未知错误')}")
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     
     with tab2:
         st.header("🔧 单项工具测试")
@@ -279,6 +302,7 @@ def main():
                 product_input = st.text_area("商品信息", height=100)
             with col2:
                 title_style = st.selectbox("标题风格", ["爆款", "简约", "高端"], key="title_style_select")
+<<<<<<< HEAD
                 title_audience = st.selectbox("目标受众", ["年轻女性", "中年女性", "年轻男性", "学生", "通用"], key="title_audience_select")
                 generate_title = st.button("生成标题")
             
@@ -313,6 +337,16 @@ def main():
                 if st.button("🗑️ 清除标题结果"):
                     st.session_state.tool_results['title_generation'] = None
                     st.rerun()
+=======
+                generate_title = st.button("生成标题")
+            
+            if generate_title and product_input:
+                result = generate_product_title.invoke({
+                    "product_info": product_input,
+                    "style": title_style
+                })
+                st.success(f"生成的标题：**{result}**")
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         elif tool_option == "策略推荐":
             st.subheader("💡 策略推荐工具")
@@ -325,6 +359,7 @@ def main():
             with col3:
                 budget_level = st.selectbox("预算", ["低", "中等", "高"], key="strategy_budget")
             
+<<<<<<< HEAD
             strategy_product_info = st.text_area("商品详细信息（可选）", height=80, key="strategy_product_info")
             
             if st.button("获取策略建议"):
@@ -359,6 +394,15 @@ def main():
                 if st.button("🗑️ 清除策略结果"):
                     st.session_state.tool_results['strategy_suggestion'] = None
                     st.rerun()
+=======
+            if st.button("获取策略建议"):
+                result = suggest_strategy.invoke({
+                    "product_type": product_type,
+                    "target_audience": audience,
+                    "budget": budget_level
+                })
+                st.info(result)
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         elif tool_option == "CTR评估":
             st.subheader("📊 CTR评估工具")
@@ -373,6 +417,7 @@ def main():
                     "keywords": keywords
                 })
                 
+<<<<<<< HEAD
                 # 保存结果到session state
                 st.session_state.tool_results['ctr_evaluation'] = {
                     'result': result,
@@ -385,6 +430,8 @@ def main():
                 saved_result = st.session_state.tool_results['ctr_evaluation']
                 result = saved_result['result']
                 
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("CTR评分", result["ctr_percentage"])
@@ -396,6 +443,7 @@ def main():
                 st.write("**优化建议：**")
                 for rec in result["recommendations"]:
                     st.write(f"• {rec}")
+<<<<<<< HEAD
                 
                 st.caption(f"标题：{saved_result['title']} | 关键词：{saved_result['keywords']}")
                 
@@ -403,6 +451,8 @@ def main():
                 if st.button("🗑️ 清除CTR结果"):
                     st.session_state.tool_results['ctr_evaluation'] = None
                     st.rerun()
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         elif tool_option == "竞品分析":
             st.subheader("🔍 竞品分析工具")
@@ -417,6 +467,7 @@ def main():
                     "our_keywords": our_keywords
                 })
                 
+<<<<<<< HEAD
                 # 保存结果到session state
                 st.session_state.tool_results['competitor_analysis'] = {
                     'result': result,
@@ -429,6 +480,8 @@ def main():
                 saved_result = st.session_state.tool_results['competitor_analysis']
                 result = saved_result['result']
                 
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
                 st.write(f"**竞品标题：** {result['competitor_title']}")
                 st.write(f"**竞品CTR：** {result['competitor_ctr_analysis']['ctr_percentage']}")
                 
@@ -446,6 +499,7 @@ def main():
                 st.write("**差异化建议：**")
                 for suggestion in result["differentiation_suggestions"]:
                     st.write(f"• {suggestion}")
+<<<<<<< HEAD
                 
                 # 显示详细分析（如果存在）
                 if "detailed_analysis" in result and result["detailed_analysis"] and result["detailed_analysis"] != "未能生成详细分析，请查看LLM连接状态":
@@ -461,6 +515,8 @@ def main():
                 if st.button("🗑️ 清除竞品分析结果"):
                     st.session_state.tool_results['competitor_analysis'] = None
                     st.rerun()
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     
     with tab3:
         st.header("💬 智能对话助手")
@@ -476,6 +532,7 @@ def main():
             # 添加用户消息到历史
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             
+<<<<<<< HEAD
             # 获取AI回复
             with st.spinner("思考中..."):
                 response = st.session_state.assistant.process_request(prompt)
@@ -495,6 +552,25 @@ def main():
             
             # 重新运行以显示更新的对话历史
             st.rerun()
+=======
+            with st.chat_message("user"):
+                st.write(prompt)
+            
+            # 获取AI回复
+            with st.chat_message("assistant"):
+                with st.spinner("思考中..."):
+                    response = st.session_state.assistant.process_request(prompt)
+                    
+                    if response["success"]:
+                        st.write(response["response"])
+                        # 添加助手回复到历史
+                        st.session_state.chat_history.append({
+                            "role": "assistant", 
+                            "content": response["response"]
+                        })
+                    else:
+                        st.error(f"处理失败: {response['error']}")
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         # 清除对话历史
         if st.button("🗑️ 清除对话历史"):

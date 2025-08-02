@@ -9,8 +9,12 @@
       "Bash(mkdir:*)",
       "Bash(python test:*)",
       "Bash(python:*)",
+<<<<<<< HEAD
       "Bash(streamlit run:*)",
       "Bash(curl:*)"
+=======
+      "Bash(streamlit run:*)"
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     ],
     "deny": []
   }

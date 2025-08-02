@@ -10,6 +10,7 @@ import jieba
 import random
 from langchain.tools import tool
 
+<<<<<<< HEAD
 # 全局LLM实例，由MerchantAssistantAgent设置
 _current_llm = None
 
@@ -276,18 +277,27 @@ def get_audience_profile(target_audience: str) -> dict:
 
 @tool
 def generate_product_title(product_info: str, style: str = "爆款", target_audience: str = "通用") -> str:
+=======
+
+@tool
+def generate_product_title(product_info: str, style: str = "爆款") -> str:
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     """
     根据商品信息生成推荐标题
     
     Args:
         product_info: 商品信息，包含类目、属性、价格等
         style: 文案风格，如"爆款"、"简约"、"高端"等
+<<<<<<< HEAD
         target_audience: 目标受众，影响标题用词和表达方式
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
     Returns:
         生成的商品标题
     """
     
+<<<<<<< HEAD
     llm = get_llm_instance()
     
     # 预处理商品信息
@@ -443,12 +453,49 @@ def generate_product_title(product_info: str, style: str = "爆款", target_audi
     
     # 清理标题
     title = re.sub(r'\s+', ' ', title).strip()
+=======
+    # 提取商品关键信息
+    keywords = list(jieba.cut(product_info))
+    keywords = [k for k in keywords if len(k) > 1]
+    
+    # 定义不同风格的标题模板
+    templates = {
+        "爆款": [
+            "【热销爆款】{product}，{feature}",
+            "🔥{product} 限时特惠，{feature}",
+            "【新品上市】{product}，{feature}，抢购中！"
+        ],
+        "简约": [
+            "{product} | {feature}",
+            "简约{product}，{feature}",
+            "{product} - {feature}"
+        ],
+        "高端": [
+            "精选{product}，{feature}",
+            "匠心{product}，{feature}",
+            "臻品{product}，{feature}"
+        ]
+    }
+    
+    # 选择模板并填充
+    template = random.choice(templates.get(style, templates["爆款"]))
+    
+    # 简单的商品信息解析
+    product_name = keywords[0] if keywords else "商品"
+    features = "品质保证" if len(keywords) < 2 else keywords[-1]
+    
+    title = template.format(product=product_name, feature=features)
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     
     return title
 
 
 @tool  
+<<<<<<< HEAD
 def suggest_strategy(product_type: str, target_audience: str = "通用", budget: str = "中等", product_info: str = "") -> str:
+=======
+def suggest_strategy(product_type: str, target_audience: str = "通用", budget: str = "中等") -> str:
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     """
     根据商品类型和目标受众推荐营销策略
     
@@ -456,12 +503,16 @@ def suggest_strategy(product_type: str, target_audience: str = "通用", budget:
         product_type: 商品类型，如"服装"、"数码"、"美妆"等
         target_audience: 目标受众，如"年轻女性"、"中年男性"、"学生"等
         budget: 预算水平，如"低"、"中等"、"高"
+<<<<<<< HEAD
         product_info: 商品详细信息，用于个性化建议
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
     Returns:
         推荐的营销策略
     """
     
+<<<<<<< HEAD
     llm = get_llm_instance()
     
     # 如果有真实的LLM，使用LLM生成详细策略
@@ -591,23 +642,72 @@ def suggest_strategy(product_type: str, target_audience: str = "通用", budget:
 
 @tool
 def estimate_ctr(title: str, keywords: List[str] = None) -> Dict[str, Any]:
+=======
+    # 基础策略库
+    strategies = {
+        "服装": {
+            "年轻女性": "建议参与抖音话题挑战，使用时尚穿搭、OOTD等标签，配合KOL合作",
+            "中年女性": "主打品质和实用性，在小红书投放，强调舒适和百搭",
+            "通用": "季节性促销，配合节日活动，强调性价比"
+        },
+        "数码": {
+            "年轻男性": "B站、知乎投放技术测评内容，强调性能参数和性价比对比",
+            "学生": "教育优惠政策，学习效率提升，分期付款选项",
+            "通用": "新品首发优惠，以旧换新活动，技术创新点突出"
+        },
+        "美妆": {
+            "年轻女性": "小红书种草，美妆博主试色，限量款营销",
+            "中年女性": "抗老功效宣传，温和配方，品牌信誉背书",
+            "通用": "节日礼盒装，买赠活动，会员专享折扣"
+        }
+    }
+    
+    # 获取策略
+    category_strategies = strategies.get(product_type, strategies["服装"])
+    strategy = category_strategies.get(target_audience, category_strategies["通用"])
+    
+    # 根据预算调整策略
+    budget_adjustments = {
+        "低": "建议采用有机流量策略，重点优化商品详情页和用户评价",
+        "中等": "适当投放信息流广告，配合达人合作进行推广",
+        "高": "全渠道投放，品牌代言人合作，线下活动配合"
+    }
+    
+    budget_advice = budget_adjustments.get(budget, budget_adjustments["中等"])
+    
+    return f"策略建议：{strategy}。预算策略：{budget_advice}"
+
+
+@tool
+def estimate_ctr(title: str, keywords: List[str], target_keywords: List[str] = None) -> Dict[str, Any]:
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     """
     估算标题点击率得分，基于关键词覆盖率和标题质量
     
     Args:
         title: 商品标题
+<<<<<<< HEAD
         keywords: 核心关键词列表（可选，如果未提供则从标题中自动提取）
+=======
+        keywords: 核心关键词列表
+        target_keywords: 目标关键词列表（可选）
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
     Returns:
         包含CTR预估分数和详细分析的字典
     """
     
+<<<<<<< HEAD
     # 如果没有提供关键词，从标题中自动提取
     if keywords is None or len(keywords) == 0:
         import jieba
         keywords = [k for k in jieba.cut(title) if len(k) > 1 and k not in ['，', '。', '、', '的', '是', '和', '与', '适合']][:5]
     
     target_keywords = keywords
+=======
+    if target_keywords is None:
+        target_keywords = keywords
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
     # 1. 关键词覆盖率计算
     title_lower = title.lower()
@@ -705,13 +805,21 @@ def get_optimization_suggestions(coverage_rate: float, length_score: float,
 
 
 @tool
+<<<<<<< HEAD
 def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = None) -> Dict[str, Any]:
+=======
+def analyze_competitor_title(competitor_title: str, our_keywords: List[str]) -> Dict[str, Any]:
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     """
     分析竞品标题，提供差异化建议
     
     Args:
         competitor_title: 竞品标题
+<<<<<<< HEAD
         our_keywords: 我们的核心关键词（可选，如果未提供则从竞品标题中推断）
+=======
+        our_keywords: 我们的核心关键词
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
     Returns:
         竞品分析结果和差异化建议
@@ -721,11 +829,14 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
     competitor_keywords = list(jieba.cut(competitor_title))
     competitor_keywords = [k for k in competitor_keywords if len(k) > 1]
     
+<<<<<<< HEAD
     # 如果没有提供我们的关键词，从竞品标题中推断相关关键词
     if our_keywords is None or len(our_keywords) == 0:
         # 基于竞品标题推断可能的关键词
         our_keywords = competitor_keywords[:3]  # 使用竞品标题的前3个关键词作为参考
     
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     # 找出共同关键词和差异关键词
     common_keywords = list(set(our_keywords) & set(competitor_keywords))
     unique_to_competitor = list(set(competitor_keywords) - set(our_keywords))
@@ -737,6 +848,7 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
         "keywords": competitor_keywords
     })
     
+<<<<<<< HEAD
     # 获取LLM实例进行详细分析
     llm = get_llm_instance()
     
@@ -826,6 +938,21 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
             differentiation_suggestions.append("竞品标题质量较高，建议学习其标题结构但要突出差异化")
         else:
             differentiation_suggestions.append("竞品标题有优化空间，我们可以在此基础上提升")
+=======
+    # 生成差异化建议
+    differentiation_suggestions = []
+    
+    if unique_to_competitor:
+        differentiation_suggestions.append(f"竞品强调了：{', '.join(unique_to_competitor[:3])}，我们可以考虑突出其他卖点")
+    
+    if unique_to_us:
+        differentiation_suggestions.append(f"我们的优势关键词：{', '.join(unique_to_us[:3])}，应该重点突出")
+    
+    if competitor_ctr["ctr_score"] > 0.7:
+        differentiation_suggestions.append("竞品标题质量较高，建议学习其标题结构但要突出差异化")
+    else:
+        differentiation_suggestions.append("竞品标题有优化空间，我们可以在此基础上提升")
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     
     return {
         "competitor_title": competitor_title,
@@ -833,6 +960,10 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
         "common_keywords": common_keywords,
         "competitor_unique_keywords": unique_to_competitor,
         "our_unique_keywords": unique_to_us,
+<<<<<<< HEAD
         "differentiation_suggestions": differentiation_suggestions,
         "detailed_analysis": detailed_analysis  # 新增详细分析
+=======
+        "differentiation_suggestions": differentiation_suggestions
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     }

@@ -21,10 +21,14 @@ from .tools.merchant_tools import (
     generate_product_title,
     suggest_strategy, 
     estimate_ctr,
+<<<<<<< HEAD
     analyze_competitor_title,
     set_llm_instance,
     preprocess_product_info,
     get_audience_profile
+=======
+    analyze_competitor_title
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
 )
 
 
@@ -47,6 +51,7 @@ class MerchantAssistantAgent:
         # 初始化LLM
         self.llm = self._init_llm()
         
+<<<<<<< HEAD
         # 设置LLM实例到工具中
         set_llm_instance(self.llm)
         
@@ -69,6 +74,17 @@ class MerchantAssistantAgent:
             "successful_strategies": []
         }
         
+=======
+        # 初始化工具
+        self.tools = self._init_tools()
+        
+        # 初始化记忆
+        self.memory = ConversationBufferMemory(
+            memory_key="chat_history",
+            return_messages=True
+        )
+        
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         # 初始化Agent
         self.agent_executor = self._init_agent()
     
@@ -165,10 +181,15 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
             tools=self.tools,
             memory=self.memory,
             verbose=True,
+<<<<<<< HEAD
             max_iterations=10,  # 增加迭代次数
             max_execution_time=300,  # 增加执行时间限制（5分钟）
             early_stopping_method="force",
             handle_parsing_errors=True
+=======
+            max_iterations=5,
+            early_stopping_method="generate"
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         )
     
     def _format_tools(self) -> str:
@@ -185,7 +206,11 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
     
     def process_request(self, user_input: str) -> Dict[str, Any]:
         """
+<<<<<<< HEAD
         处理用户请求（增强版，包含学习机制）
+=======
+        处理用户请求
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         Args:
             user_input: 用户输入
@@ -194,17 +219,24 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
             处理结果字典
         """
         try:
+<<<<<<< HEAD
             # 在处理前分析用户输入，提取偏好线索
             self._analyze_user_feedback(user_input)
             
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
             # 执行Agent
             result = self.agent_executor.invoke({"input": user_input})
             
             return {
                 "success": True,
                 "response": result["output"],
+<<<<<<< HEAD
                 "chat_history": self.memory.chat_memory.messages,
                 "learned_preferences": self.extract_user_preferences_from_history()
+=======
+                "chat_history": self.memory.chat_memory.messages
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
             }
             
         except Exception as e:
@@ -214,6 +246,7 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
                 "response": f"抱歉，处理您的请求时出现了错误：{str(e)}"
             }
     
+<<<<<<< HEAD
     def _analyze_user_feedback(self, user_input: str):
         """分析用户输入中的反馈信息"""
         user_input_lower = user_input.lower()
@@ -226,12 +259,18 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
         # 例如：记录用户对特定风格或策略的反馈
         pass
     
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
     def generate_complete_solution(self, product_info: str, 
                                  competitor_title: str = None,
                                  target_audience: str = "通用",
                                  budget: str = "中等") -> Dict[str, Any]:
         """
+<<<<<<< HEAD
         生成完整的商品优化解决方案（融入历史记忆）
+=======
+        生成完整的商品优化解决方案
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         
         Args:
             product_info: 商品信息
@@ -243,6 +282,7 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
             完整解决方案
         """
         
+<<<<<<< HEAD
         # 提取历史偏好
         preferences = self.extract_user_preferences_from_history()
         contextual_suggestions = self.get_contextual_suggestions(product_info, target_audience)
@@ -278,6 +318,23 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
                     "product_info": enhanced_product_info,
                     "style": style,
                     "target_audience": target_audience
+=======
+        solution = {
+            "product_info": product_info,
+            "target_audience": target_audience,
+            "budget": budget
+        }
+        
+        try:
+            # 1. 生成商品标题（多个版本）
+            titles = []
+            styles = ["爆款", "简约", "高端"]
+            
+            for style in styles:
+                title_result = generate_product_title.invoke({
+                    "product_info": product_info,
+                    "style": style
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
                 })
                 titles.append({
                     "style": style,
@@ -290,6 +347,7 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
             # 从商品信息中提取类型
             product_type = self._extract_product_type(product_info)
             
+<<<<<<< HEAD
             # 增强策略输入信息
             enhanced_strategy_input = product_info
             if contextual_suggestions:
@@ -302,6 +360,12 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
                 "target_audience": target_audience,
                 "budget": budget,
                 "product_info": enhanced_strategy_input
+=======
+            strategy_result = suggest_strategy.invoke({
+                "product_type": product_type,
+                "target_audience": target_audience,
+                "budget": budget
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
             })
             
             solution["strategy_suggestion"] = strategy_result
@@ -362,6 +426,7 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
                     return category
         
         return "服装"  # 默认类型
+<<<<<<< HEAD
     
     def extract_user_preferences_from_history(self) -> dict:
         """从对话历史中提取用户偏好"""
@@ -426,6 +491,8 @@ Final Answer: 给用户的最终回复，包含具体建议和解释
             suggestions.append(f"我会避免使用您不喜欢的词汇：{', '.join(preferences['keywords_disliked'][:2])}")
         
         return "; ".join(suggestions) if suggestions else ""
+=======
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
 
 
 class MockLLM:
@@ -440,6 +507,49 @@ class MockLLM:
     
     def invoke(self, prompt: str) -> str:
         """模拟LLM调用"""
+<<<<<<< HEAD
+=======
+        # 简化的Agent响应逻辑
+        if "Question:" in prompt or "用户输入：" in prompt:
+            # 提取用户输入
+            lines = prompt.split('\n')
+            user_input = ""
+            for line in lines:
+                if "用户输入：" in line:
+                    user_input = line.split("用户输入：")[-1].strip()
+                    break
+            
+            # 基于关键词生成响应
+            if "标题" in user_input:
+                return """Thought: 用户需要生成商品标题，我应该使用generate_product_title工具
+Action: generate_product_title
+Action Input: {"product_info": "商品信息", "style": "爆款"}
+Observation: 【热销爆款】商品名称，品质保证
+Thought: 现在我知道最终答案了
+Final Answer: 我为您生成了一个爆款风格的商品标题：【热销爆款】商品名称，品质保证。这个标题突出了商品的热销特点和品质保证，能够吸引用户点击。"""
+                
+            elif "策略" in user_input:
+                return """Thought: 用户需要营销策略建议，我应该使用suggest_strategy工具
+Action: suggest_strategy  
+Action Input: {"product_type": "服装", "target_audience": "年轻女性", "budget": "中等"}
+Observation: 建议采用抖音话题挑战营销，配合KOL合作推广
+Thought: 现在我知道最终答案了
+Final Answer: 根据您的需求，我建议采用以下营销策略：参与抖音话题挑战，使用时尚穿搭等标签，配合KOL合作进行推广。这种策略适合年轻女性群体，能够有效提升品牌知名度和转化率。"""
+                
+            elif "CTR" in user_input or "评估" in user_input:
+                return """Thought: 用户需要CTR评估，我应该使用estimate_ctr工具
+Action: estimate_ctr
+Action Input: {"title": "商品标题", "keywords": ["关键词1", "关键词2"]}
+Observation: {"ctr_score": 0.85, "ctr_percentage": "85%", "recommendations": ["优化建议"]}
+Thought: 现在我知道最终答案了
+Final Answer: 经过分析，该标题的CTR评分为85%，整体质量较好。建议可以进一步优化关键词覆盖率和标题长度以获得更好的效果。"""
+                
+            else:
+                return f"""Thought: 用户的问题是关于商家运营的，我需要提供专业建议
+Thought: 现在我知道最终答案了
+Final Answer: 感谢您的咨询！作为电商运营顾问助手，我可以帮您解决商品标题优化、营销策略制定、CTR效果评估等问题。请告诉我您的具体需求，我会为您提供专业的建议。"""
+        
+>>>>>>> 897f5b5e2b65b2fb6f20eaeae1ac142ff40eee56
         return "这是一个模拟回复，请配置真实的LLM服务以获得更好的体验。"
     
     def __call__(self, prompt: str) -> str:
