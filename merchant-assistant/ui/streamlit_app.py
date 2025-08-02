@@ -32,6 +32,15 @@ def init_session_state():
     
     if 'assistant' not in st.session_state:
         st.session_state.assistant = None
+    
+    # 初始化工具结果存储
+    if 'tool_results' not in st.session_state:
+        st.session_state.tool_results = {
+            'title_generation': None,
+            'strategy_suggestion': None,
+            'ctr_evaluation': None,
+            'competitor_analysis': None
+        }
 
 
 def main():
@@ -284,8 +293,26 @@ def main():
                             "style": title_style,
                             "target_audience": title_audience
                         })
-                    st.success(f"生成的标题：**{result}**")
-                    st.info(f"风格：{title_style} | 受众：{title_audience}")
+                    
+                    # 保存结果到session state
+                    st.session_state.tool_results['title_generation'] = {
+                        'result': result,
+                        'style': title_style,
+                        'audience': title_audience,
+                        'product_info': product_input
+                    }
+            
+            # 显示保存的结果（如果存在）
+            if st.session_state.tool_results['title_generation']:
+                saved_result = st.session_state.tool_results['title_generation']
+                st.success(f"生成的标题：**{saved_result['result']}**")
+                st.info(f"风格：{saved_result['style']} | 受众：{saved_result['audience']}")
+                st.caption(f"商品信息：{saved_result['product_info'][:50]}...")
+                
+                # 清除结果按钮
+                if st.button("🗑️ 清除标题结果"):
+                    st.session_state.tool_results['title_generation'] = None
+                    st.rerun()
         
         elif tool_option == "策略推荐":
             st.subheader("💡 策略推荐工具")
@@ -312,7 +339,26 @@ def main():
                             "budget": budget_level,
                             "product_info": strategy_product_info or f"{product_type}商品"
                         })
-                    st.markdown(result)
+                    
+                    # 保存结果到session state
+                    st.session_state.tool_results['strategy_suggestion'] = {
+                        'result': result,
+                        'product_type': product_type,
+                        'audience': audience,
+                        'budget': budget_level,
+                        'product_info': strategy_product_info or f"{product_type}商品"
+                    }
+            
+            # 显示保存的结果（如果存在）
+            if st.session_state.tool_results['strategy_suggestion']:
+                saved_result = st.session_state.tool_results['strategy_suggestion']
+                st.markdown(saved_result['result'])
+                st.caption(f"商品类型：{saved_result['product_type']} | 受众：{saved_result['audience']} | 预算：{saved_result['budget']}")
+                
+                # 清除结果按钮
+                if st.button("🗑️ 清除策略结果"):
+                    st.session_state.tool_results['strategy_suggestion'] = None
+                    st.rerun()
         
         elif tool_option == "CTR评估":
             st.subheader("📊 CTR评估工具")
@@ -327,6 +373,18 @@ def main():
                     "keywords": keywords
                 })
                 
+                # 保存结果到session state
+                st.session_state.tool_results['ctr_evaluation'] = {
+                    'result': result,
+                    'title': title_input,
+                    'keywords': keywords_input
+                }
+            
+            # 显示保存的结果（如果存在）
+            if st.session_state.tool_results['ctr_evaluation']:
+                saved_result = st.session_state.tool_results['ctr_evaluation']
+                result = saved_result['result']
+                
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.metric("CTR评分", result["ctr_percentage"])
@@ -338,6 +396,13 @@ def main():
                 st.write("**优化建议：**")
                 for rec in result["recommendations"]:
                     st.write(f"• {rec}")
+                
+                st.caption(f"标题：{saved_result['title']} | 关键词：{saved_result['keywords']}")
+                
+                # 清除结果按钮
+                if st.button("🗑️ 清除CTR结果"):
+                    st.session_state.tool_results['ctr_evaluation'] = None
+                    st.rerun()
         
         elif tool_option == "竞品分析":
             st.subheader("🔍 竞品分析工具")
@@ -351,6 +416,18 @@ def main():
                     "competitor_title": competitor_input,
                     "our_keywords": our_keywords
                 })
+                
+                # 保存结果到session state
+                st.session_state.tool_results['competitor_analysis'] = {
+                    'result': result,
+                    'competitor_title': competitor_input,
+                    'our_keywords': our_keywords_input
+                }
+            
+            # 显示保存的结果（如果存在）
+            if st.session_state.tool_results['competitor_analysis']:
+                saved_result = st.session_state.tool_results['competitor_analysis']
+                result = saved_result['result']
                 
                 st.write(f"**竞品标题：** {result['competitor_title']}")
                 st.write(f"**竞品CTR：** {result['competitor_ctr_analysis']['ctr_percentage']}")
@@ -369,6 +446,21 @@ def main():
                 st.write("**差异化建议：**")
                 for suggestion in result["differentiation_suggestions"]:
                     st.write(f"• {suggestion}")
+                
+                # 显示详细分析（如果存在）
+                if "detailed_analysis" in result and result["detailed_analysis"] and result["detailed_analysis"] != "未能生成详细分析，请查看LLM连接状态":
+                    st.subheader("📊 深度分析报告")
+                    st.markdown(result["detailed_analysis"])
+                    st.caption("⚡ 由Ollama LLM生成的专业分析")
+                elif "detailed_analysis" in result:
+                    st.info("💡 提示：切换到Ollama模式可获得LLM生成的深度分析报告")
+                
+                st.caption(f"竞品标题：{saved_result['competitor_title']} | 我们的关键词：{saved_result['our_keywords']}")
+                
+                # 清除结果按钮
+                if st.button("🗑️ 清除竞品分析结果"):
+                    st.session_state.tool_results['competitor_analysis'] = None
+                    st.rerun()
     
     with tab3:
         st.header("💬 智能对话助手")

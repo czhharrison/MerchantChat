@@ -737,19 +737,95 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
         "keywords": competitor_keywords
     })
     
+    # 获取LLM实例进行详细分析
+    llm = get_llm_instance()
+    
     # 生成差异化建议
     differentiation_suggestions = []
+    detailed_analysis = ""
     
-    if unique_to_competitor:
-        differentiation_suggestions.append(f"竞品强调了：{', '.join(unique_to_competitor[:3])}，我们可以考虑突出其他卖点")
+    # 如果有真实的LLM，使用LLM进行深度分析
+    if llm and llm.__class__.__name__ != 'MockLLM':
+        analysis_prompt = f"""你是一位资深的电商竞品分析专家，拥有10年+的行业经验。
+
+【竞品标题分析】
+- 竞品标题：{competitor_title}
+- CTR评分：{competitor_ctr['ctr_percentage']}
+- 标题长度：{competitor_ctr['title_length']}字符
+- 关键词覆盖率：{competitor_ctr['coverage_rate']:.1%}
+
+【关键词对比】
+- 竞品关键词：{', '.join(competitor_keywords[:5])}
+- 我们的关键词：{', '.join(our_keywords[:5])}
+- 共同关键词：{', '.join(common_keywords) if common_keywords else '无'}
+- 竞品独有：{', '.join(unique_to_competitor[:3]) if unique_to_competitor else '无'}
+- 我们独有：{', '.join(unique_to_us[:3]) if unique_to_us else '无'}
+
+【分析要求】
+请从以下7个维度进行深度分析：
+
+1. **竞品优劣势分析** (100字)
+   - 分析竞品标题的优点和不足
+   - 评估其市场吸引力和点击潜力
+
+2. **用户心理分析** (120字)
+   - 分析竞品标题针对的目标用户群体
+   - 推断用户看到此标题的心理反应
+
+3. **差异化突破点** (150字)
+   - 根据关键词对比找出我们的优势点
+   - 提供3-5个具体的差异化策略
+
+4. **标题优化建议** (120字)
+   - 对我们的标题提出具体优化建议
+   - 如何超越竞品标题的吸引力
+
+5. **市场定位分析** (100字)
+   - 分析竞品的市场定位策略
+   - 我们应该采取的定位策略
+
+6. **竞争风险评估** (80字)
+   - 评估该竞品的市场威胁程度
+   - 提出应对策略
+
+7. **执行建议** (80字)
+   - 提供可执行的下一步行动计划
+   - 优先级排序和时间安排
+
+【输出要求】
+- 总字数控制在650字左右
+- 每个维度都要具体可执行，避免空洞概念
+- 紧密结合竞品数据和关键词分析
+- 语言专业但易懂，逻辑清晰
+
+请基于以上分析框架，输出完整的竞品分析报告："""
+        
+        try:
+            detailed_analysis = llm.invoke(analysis_prompt).strip()
+            
+            # 从详细分析中提取关键建议
+            if "差异化突破点" in detailed_analysis:
+                # 简化提取主要建议
+                differentiation_suggestions.append("基于LLM深度分析，详见完整分析报告")
+            else:
+                differentiation_suggestions.append("使用了LLM进行专业分析，请查看详细报告")
+                
+        except Exception as e:
+            print(f"竞品分析LLM调用失败: {e}")
+            detailed_analysis = "未能生成详细分析，请查看LLM连接状态"
     
-    if unique_to_us:
-        differentiation_suggestions.append(f"我们的优势关键词：{', '.join(unique_to_us[:3])}，应该重点突出")
-    
-    if competitor_ctr["ctr_score"] > 0.7:
-        differentiation_suggestions.append("竞品标题质量较高，建议学习其标题结构但要突出差异化")
-    else:
-        differentiation_suggestions.append("竞品标题有优化空间，我们可以在此基础上提升")
+    # 回退到基础分析（如果没有LLM或LLM失败）
+    if not detailed_analysis:
+        if unique_to_competitor:
+            differentiation_suggestions.append(f"竞品强调了：{', '.join(unique_to_competitor[:3])}，我们可以考虑突出其他卖点")
+        
+        if unique_to_us:
+            differentiation_suggestions.append(f"我们的优势关键词：{', '.join(unique_to_us[:3])}，应该重点突出")
+        
+        if competitor_ctr["ctr_score"] > 0.7:
+            differentiation_suggestions.append("竞品标题质量较高，建议学习其标题结构但要突出差异化")
+        else:
+            differentiation_suggestions.append("竞品标题有优化空间，我们可以在此基础上提升")
     
     return {
         "competitor_title": competitor_title,
@@ -757,5 +833,6 @@ def analyze_competitor_title(competitor_title: str, our_keywords: List[str] = No
         "common_keywords": common_keywords,
         "competitor_unique_keywords": unique_to_competitor,
         "our_unique_keywords": unique_to_us,
-        "differentiation_suggestions": differentiation_suggestions
+        "differentiation_suggestions": differentiation_suggestions,
+        "detailed_analysis": detailed_analysis  # 新增详细分析
     }

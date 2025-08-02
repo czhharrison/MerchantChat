@@ -94,10 +94,24 @@ def start_web_app():
         print("如果没有自动打开，请手动访问: http://localhost:8501")
         print("\n按 Ctrl+C 停止服务")
         
-        # 启动streamlit（禁用自动打开浏览器）
+        # 在单独线程中延迟打开浏览器（仅一次）
+        def open_browser_once():
+            time.sleep(3)  # 等待streamlit启动
+            try:
+                webbrowser.open('http://localhost:8501')
+                print("✓ 浏览器已自动打开")
+            except Exception as e:
+                print(f"打开浏览器失败: {e}")
+        
+        import threading
+        browser_thread = threading.Thread(target=open_browser_once)
+        browser_thread.daemon = True
+        browser_thread.start()
+        
+        # 启动streamlit（禁用自动打开浏览器，避免重复）
         subprocess.run([
             sys.executable, '-m', 'streamlit', 'run', 'streamlit_app.py',
-            '--server.headless', 'true',  # 禁用自动打开浏览器
+            '--server.headless', 'true',  # 禁用streamlit自动打开
             '--browser.gatherUsageStats', 'false'  # 禁用统计数据收集
         ])
         
